@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+const { useState, useEffect, useRef } = React;
 
-export default function UkulelePractice() {
+function UkulelePractice() {
   const allChords = ['C', 'Am', 'F', 'G', 'D', 'Em', 'A', 'Dm'];
   
   const [selectedChords, setSelectedChords] = useState(['C', 'Am', 'F', 'G']);
