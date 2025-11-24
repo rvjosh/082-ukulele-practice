@@ -110,6 +110,7 @@ function UkulelePractice() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-8">
       <div className="max-w-4xl mx-auto">
+        <a href="index.html" className="text-amber-600 hover:text-amber-800 mb-4 inline-block">&larr; Back</a>
         <h1 className="text-4xl font-bold text-center text-amber-900 mb-8">
           🎸 Ukulele Chord Practice
         </h1>
