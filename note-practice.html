@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note Practice</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef } = React;
+
+    function NotePractice() {
+      const [currentNote, setCurrentNote] = useState('C');
+      const audioContextRef = useRef(null);
+
+      const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
+      // Frequencies for C4-B4 (middle C octave)
+      const noteFrequencies = {
+        'C': 261.63,
+        'D': 293.66,
+        'E': 329.63,
+        'F': 349.23,
+        'G': 392.00,
+        'A': 440.00,
+        'B': 493.88
+      };
+
+      const getAudioContext = () => {
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioContextRef.current;
+      };
+
+      const playNote = () => {
+        const audioContext = getAudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.type = 'sine';
+        oscillator.frequency.value = noteFrequencies[currentNote];
+
+        // Envelope for smoother sound
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 2);
+      };
+
+      const nextNote = () => {
+        const otherNotes = notes.filter(n => n !== currentNote);
+        const randomNote = otherNotes[Math.floor(Math.random() * otherNotes.length)];
+        setCurrentNote(randomNote);
+      };
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-8">
+          <div className="max-w-md mx-auto">
+            <h1 className="text-3xl font-bold text-amber-900 text-center mb-8">
+              Note Practice
+            </h1>
+
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+              {/* Note Display */}
+              <div className="text-9xl font-bold text-amber-600 mb-8">
+                {currentNote}
+              </div>
+
+              {/* Play Button */}
+              <button
+                onClick={playNote}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-8 rounded-lg text-xl mb-4 transition-colors"
+              >
+                Play Note
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={nextNote}
+                className="w-full bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-4 px-8 rounded-lg text-xl transition-colors"
+              >
+                Next Note
+              </button>
+            </div>
+
+            <p className="text-amber-700 text-center mt-4 text-sm">
+              Notes: C4 - B4 (Middle C octave)
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<NotePractice />);
+  </script>
+</body>
+</html>
