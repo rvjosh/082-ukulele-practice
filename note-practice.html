@@ -12,23 +12,59 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useMemo, useEffect } = React;
 
     function NotePractice() {
-      const [currentNote, setCurrentNote] = useState('C');
       const audioContextRef = useRef(null);
 
-      const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+      // All notes from C2 to B4 (3 octaves)
+      const allNotes = [
+        'C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2',
+        'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3',
+        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'
+      ];
 
-      // Frequencies for C4-B4 (middle C octave)
+      // Frequencies for all notes C2-B4
       const noteFrequencies = {
-        'C': 261.63,
-        'D': 293.66,
-        'E': 329.63,
-        'F': 349.23,
-        'G': 392.00,
-        'A': 440.00,
-        'B': 493.88
+        'C2': 65.41, 'D2': 73.42, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'A2': 110.00, 'B2': 123.47,
+        'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+        'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88
+      };
+
+      const [rangeStart, setRangeStart] = useState(14); // C4
+      const [rangeEnd, setRangeEnd] = useState(20); // B4
+      const [currentNote, setCurrentNote] = useState(allNotes[14]); // C4
+      const [isTimerRunning, setIsTimerRunning] = useState(false);
+      const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+      const availableNotes = useMemo(() => {
+        return allNotes.slice(rangeStart, rangeEnd + 1);
+      }, [rangeStart, rangeEnd]);
+
+      // Timer effect
+      useEffect(() => {
+        let interval;
+        if (isTimerRunning) {
+          interval = setInterval(() => {
+            setElapsedSeconds(prev => prev + 1);
+          }, 1000);
+        }
+        return () => clearInterval(interval);
+      }, [isTimerRunning]);
+
+      const formatTime = (totalSeconds) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      };
+
+      const handleStart = () => {
+        setIsTimerRunning(true);
+      };
+
+      const handleStop = () => {
+        setIsTimerRunning(false);
+        setElapsedSeconds(0);
       };
 
       const getAudioContext = () => {
@@ -49,19 +85,42 @@
         oscillator.type = 'sine';
         oscillator.frequency.value = noteFrequencies[currentNote];
 
-        // Envelope for smoother sound
+        // Longer envelope for sustained sound
         gainNode.gain.setValueAtTime(0, audioContext.currentTime);
         gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
-        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
+        gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 1.5);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2.0);
 
         oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 2);
+        oscillator.stop(audioContext.currentTime + 2.0);
       };
 
       const nextNote = () => {
-        const otherNotes = notes.filter(n => n !== currentNote);
+        const otherNotes = availableNotes.filter(n => n !== currentNote);
+        if (otherNotes.length === 0) {
+          // If only one note in range, keep it
+          return;
+        }
         const randomNote = otherNotes[Math.floor(Math.random() * otherNotes.length)];
         setCurrentNote(randomNote);
+      };
+
+      const handleRangeStartChange = (e) => {
+        const newStart = parseInt(e.target.value);
+        setRangeStart(newStart);
+        // Ensure current note is within new range
+        if (allNotes.indexOf(currentNote) < newStart || allNotes.indexOf(currentNote) > rangeEnd) {
+          setCurrentNote(allNotes[newStart]);
+        }
+      };
+
+      const handleRangeEndChange = (e) => {
+        const newEnd = parseInt(e.target.value);
+        setRangeEnd(newEnd);
+        // Ensure current note is within new range
+        if (allNotes.indexOf(currentNote) < rangeStart || allNotes.indexOf(currentNote) > newEnd) {
+          setCurrentNote(allNotes[newEnd]);
+        }
       };
 
       return (
@@ -71,7 +130,7 @@
               Note Practice
             </h1>
 
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center mb-6">
               {/* Note Display */}
               <div className="text-9xl font-bold text-amber-600 mb-8">
                 {currentNote}
@@ -94,9 +153,65 @@
               </button>
             </div>
 
-            <p className="text-amber-700 text-center mt-4 text-sm">
-              Notes: C4 - B4 (Middle C octave)
-            </p>
+            {/* Range Selection */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-lg font-semibold text-amber-900 mb-4">Note Range</h2>
+
+              <div className="mb-4">
+                <label className="block text-sm text-amber-700 mb-2">
+                  From: <span className="font-bold">{allNotes[rangeStart]}</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max={rangeEnd}
+                  value={rangeStart}
+                  onChange={handleRangeStartChange}
+                  className="w-full accent-amber-500"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm text-amber-700 mb-2">
+                  To: <span className="font-bold">{allNotes[rangeEnd]}</span>
+                </label>
+                <input
+                  type="range"
+                  min={rangeStart}
+                  max="20"
+                  value={rangeEnd}
+                  onChange={handleRangeEndChange}
+                  className="w-full accent-amber-500"
+                />
+              </div>
+
+              <p className="text-amber-600 text-sm text-center">
+                {availableNotes.length} note{availableNotes.length !== 1 ? 's' : ''}: {allNotes[rangeStart]} - {allNotes[rangeEnd]}
+              </p>
+            </div>
+
+            {/* Timer */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <div className="text-4xl font-mono font-bold text-amber-900 text-center mb-4">
+                {formatTime(elapsedSeconds)}
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={handleStart}
+                  disabled={isTimerRunning}
+                  className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
+                >
+                  Start
+                </button>
+                <button
+                  onClick={handleStop}
+                  disabled={!isTimerRunning && elapsedSeconds === 0}
+                  className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
+                >
+                  Stop
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       );
