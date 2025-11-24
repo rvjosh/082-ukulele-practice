@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 function UkulelePractice() {
-  const allChords = ['C', 'Am', 'F', 'G', 'D', 'Em', 'A', 'Dm'];
+  const allChords = ['C', 'Am', 'F', 'G', 'D', 'Em', 'A', 'Dm', 'D7', 'G7'];
   
   const [selectedChords, setSelectedChords] = useState(['C', 'Am', 'F', 'G']);
   const [currentChord, setCurrentChord] = useState('');
