@@ -36,7 +36,7 @@ function UkulelePractice() {
       
       beatInterval = setInterval(() => {
         setCurrentBeat(prev => {
-          if (prev >= 4) {
+          if (prev >= beatsPerChord) {
             return 1;
           }
           return prev + 1;
@@ -46,7 +46,7 @@ function UkulelePractice() {
       setCurrentBeat(0);
     }
     return () => clearInterval(beatInterval);
-  }, [isPlaying, bpm]);
+  }, [isPlaying, bpm, beatsPerChord]);
 
   // Chord rotation based on BPM
   useEffect(() => {
@@ -129,8 +129,8 @@ function UkulelePractice() {
               </div>
               
               {/* Beat Indicator */}
-              <div className="flex justify-center items-center gap-6 mb-6">
-                {Array.from({ length: 4 }, (_, i) => {
+              <div className="flex justify-center items-center gap-6 mb-6 flex-wrap">
+                {Array.from({ length: beatsPerChord }, (_, i) => {
                   const beatNum = i + 1;
                   const isActive = currentBeat === beatNum;
                   
