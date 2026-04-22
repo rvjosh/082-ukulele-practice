@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sight Reading Practice — Two-String Songs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Crimson+Pro:ital,wght@0,300..900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-min.js"></script>
+<style>
+  :root {
+    --paper: #f5efe0;
+    --paper-shadow: #e8dfc9;
+    --ink: #1a1612;
+    --ink-soft: #4a4036;
+    --ink-light: #8a7e6d;
+    --burgundy: #7a2e2e;
+    --burgundy-dark: #5c2222;
+    --accent-gold: #b8954a;
+    --correct: #3a6b3a;
+    --incorrect: #a84040;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(184, 149, 74, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(122, 46, 46, 0.03) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+  }
+
+  header::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .header-ornament {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    color: var(--accent-gold);
+    font-size: 22px;
+    margin-bottom: 8px;
+    letter-spacing: 0.4em;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(36px, 5vw, 52px);
+    font-variation-settings: "opsz" 144;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--burgundy);
+  }
+
+  .subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 18px;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--ink-light);
+    padding: 14px 32px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .tab:hover { color: var(--ink-soft); }
+
+  .tab.active {
+    color: var(--burgundy);
+    font-weight: 500;
+  }
+
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 20%;
+    right: 20%;
+    height: 4px;
+    background: var(--burgundy);
+  }
+
+  .panel {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .staff-container {
+    background: #fdfbf3;
+    border: 1px solid var(--paper-shadow);
+    border-radius: 2px;
+    padding: 24px 16px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 4px 16px rgba(0,0,0,0.06),
+      inset 0 0 0 1px rgba(255,255,255,0.4);
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .staff-container.small {
+    min-height: 200px;
+    padding: 24px;
+  }
+
+  .staff-container svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .tempo-marking {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+    margin-bottom: 24px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .control-group.wide { grid-column: 1 / -1; }
+
+  .control-group label {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .segmented {
+    display: flex;
+    border: 1px solid var(--ink-soft);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .segmented button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-right: 1px solid var(--ink-soft);
+    transition: all 0.15s;
+  }
+
+  .segmented button:last-child { border-right: none; }
+
+  .segmented button:hover {
+    background: rgba(122, 46, 46, 0.06);
+  }
+
+  .segmented button.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--ink-light);
+    border-radius: 3px;
+    outline: none;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: var(--burgundy);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--paper);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    transition: transform 0.1s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: var(--burgundy);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--paper);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  }
+
+  /* Tempo number input */
+  #tempo-num {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 500;
+    width: 64px;
+    padding: 4px 8px;
+    background: #fdfbf3;
+    border: 1px solid var(--ink-soft);
+    border-radius: 2px;
+    color: var(--ink);
+    text-align: center;
+    margin: 0 4px;
+    -moz-appearance: textfield;
+  }
+
+  #tempo-num::-webkit-outer-spin-button,
+  #tempo-num::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  #tempo-num:focus {
+    outline: none;
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 2px rgba(122, 46, 46, 0.15);
+  }
+
+  .control-group label .unit {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+  }
+
+  .tempo-presets {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tempo-presets button {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--ink-light);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.12s;
+    letter-spacing: 0.02em;
+  }
+
+  .tempo-presets button:hover {
+    background: var(--ink-soft);
+    color: var(--paper);
+    border-color: var(--ink-soft);
+  }
+
+  .tempo-presets button.active {
+    background: var(--burgundy);
+    color: var(--paper);
+    border-color: var(--burgundy);
+  }
+
+  .button-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    margin-top: 8px;
+  }
+
+  .btn {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    padding: 12px 24px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+    font-weight: 400;
+  }
+
+  .btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn.primary {
+    background: var(--burgundy);
+    color: var(--paper);
+    border-color: var(--burgundy);
+  }
+
+  .btn.primary:hover {
+    background: var(--burgundy-dark);
+    border-color: var(--burgundy-dark);
+  }
+
+  .btn.subtle {
+    border-color: var(--ink-light);
+    color: var(--ink-soft);
+    font-size: 15px;
+    padding: 10px 18px;
+  }
+
+  .btn.subtle:hover {
+    background: var(--ink-soft);
+    color: var(--paper);
+    border-color: var(--ink-soft);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Flashcards */
+  .flash-buttons {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .note-btn {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    padding: 18px 0;
+    background: #fdfbf3;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.12s;
+  }
+
+  .note-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translateY(-1px);
+  }
+
+  .note-btn:active { transform: scale(0.97); }
+
+  .note-btn.correct {
+    background: var(--correct) !important;
+    color: var(--paper) !important;
+    border-color: var(--correct) !important;
+    animation: pulse 0.4s;
+  }
+
+  .note-btn.incorrect {
+    background: var(--incorrect) !important;
+    color: var(--paper) !important;
+    border-color: var(--incorrect) !important;
+    animation: shake 0.4s;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .feedback {
+    min-height: 48px;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    padding: 8px 12px;
+  }
+
+  .feedback.show {
+    color: var(--ink);
+  }
+
+  .feedback strong {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--burgundy);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 20px 16px;
+    background: rgba(122, 46, 46, 0.04);
+    border-top: 1px solid var(--paper-shadow);
+    border-bottom: 1px solid var(--paper-shadow);
+    margin-bottom: 20px;
+  }
+
+  .stat {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1;
+    font-variation-settings: "opsz" 72;
+  }
+
+  .stat-label {
+    font-family: 'Fraunces', serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-light);
+  }
+
+  .flash-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--paper-shadow);
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-light);
+    letter-spacing: 0.02em;
+  }
+
+  footer .fretguide {
+    display: inline-block;
+    margin-top: 6px;
+    font-style: normal;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  footer .fretguide span {
+    display: inline-block;
+    margin: 0 8px;
+    padding: 2px 8px;
+    background: rgba(184, 149, 74, 0.15);
+    border-radius: 2px;
+    color: var(--ink-soft);
+  }
+
+  footer .fretguide em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--burgundy);
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 32px 16px 60px; }
+    .controls { grid-template-columns: 1fr; gap: 20px; }
+    .flash-buttons { grid-template-columns: repeat(3, 1fr); }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .tab { padding: 12px 16px; font-size: 17px; }
+    h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="header-ornament">· ·  ·</div>
+    <h1>Sight Reading <em>Practice</em></h1>
+    <p class="subtitle">Two-String Exercises — B and High E</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="melody">Melody Generator</button>
+    <button class="tab" data-tab="flash">Flashcards</button>
+  </nav>
+
+  <!-- ============ MELODY GENERATOR ============ -->
+  <section id="melody-panel" class="panel active">
+    <div class="tempo-marking" id="tempo-marking">♩ = 100</div>
+    <div class="staff-container" id="melody-staff">
+      <p style="color: var(--ink-light); font-style: italic;">Loading notation…</p>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Difficulty</label>
+        <div class="segmented" id="difficulty-seg">
+          <button data-value="easy" class="active">Easy</button>
+          <button data-value="medium">Medium</button>
+          <button data-value="hard">Hard</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Measures</label>
+        <div class="segmented" id="measures-seg">
+          <button data-value="4" class="active">4</button>
+          <button data-value="8">8</button>
+        </div>
+      </div>
+
+      <div class="control-group wide">
+        <label>Tempo
+          <input type="number" id="tempo-num" min="40" max="200" value="100" step="1">
+          <span class="unit">BPM</span>
+        </label>
+        <input type="range" id="tempo" min="40" max="200" value="100" step="1">
+        <div class="tempo-presets" id="tempo-presets">
+          <button type="button" data-tempo="60">60</button>
+          <button type="button" data-tempo="80">80</button>
+          <button type="button" data-tempo="100">100</button>
+          <button type="button" data-tempo="120">120</button>
+          <button type="button" data-tempo="140">140</button>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="generate" class="btn primary">✦ New Melody</button>
+        <button id="play" class="btn">▶ Play</button>
+        <button id="toggle-names" class="btn subtle">Show Note Names</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FLASHCARDS ============ -->
+  <section id="flash-panel" class="panel">
+    <div class="staff-container small" id="flash-staff">
+      <p style="color: var(--ink-light); font-style: italic;">Loading notation…</p>
+    </div>
+
+    <div class="feedback" id="flash-feedback">
+      <em>Identify the note.</em>
+    </div>
+
+    <div class="flash-buttons" id="flash-buttons">
+      <button class="note-btn" data-note="B">B</button>
+      <button class="note-btn" data-note="C">C</button>
+      <button class="note-btn" data-note="D">D</button>
+      <button class="note-btn" data-note="E">E</button>
+      <button class="note-btn" data-note="F">F</button>
+      <button class="note-btn" data-note="G">G</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+      <div class="stat"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total</span></div>
+      <div class="stat"><span class="stat-num" id="stat-streak">0</span><span class="stat-label">Streak</span></div>
+      <div class="stat"><span class="stat-num" id="stat-accuracy">—</span><span class="stat-label">Accuracy</span></div>
+    </div>
+
+    <div class="flash-actions">
+      <button id="hear-note" class="btn subtle">♪ Hear Note</button>
+      <button id="reset-stats" class="btn subtle">Reset Stats</button>
+    </div>
+  </section>
+
+  <footer>
+    <div>Notes used: B, C, D on B string · E, F, G on high E string</div>
+    <div class="fretguide">
+      <span><em>B</em> 0</span>
+      <span><em>C</em> 1</span>
+      <span><em>D</em> 3</span>
+      <span><em>E</em> 0</span>
+      <span><em>F</em> 1</span>
+      <span><em>G</em> 3</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ============================================================
+// AUDIO
+// ============================================================
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Guitar sounds an octave below written; use the sounding pitch so playback
+// sounds at guitar pitch rather than piccolo-high.
+const NOTE_FREQ = {
+  'b/4': 246.94,  // B3
+  'c/5': 261.63,  // C4
+  'd/5': 293.66,  // D4
+  'e/5': 329.63,  // E4
+  'f/5': 349.23,  // F4
+  'g/5': 392.00,  // G4
+};
+
+// Fret locations for feedback
+const FRET_LOC = {
+  'B': 'open B string',
+  'C': '1st fret, B string',
+  'D': '3rd fret, B string',
+  'E': 'open high E string',
+  'F': '1st fret, high E string',
+  'G': '3rd fret, high E string',
+};
+
+// Pluck-ish synthesized note
+function scheduleNote(when, freq, duration) {
+  const ctx = getCtx();
+  const gain = ctx.createGain();
+
+  // Fundamental (triangle for warmth)
+  const o1 = ctx.createOscillator();
+  o1.type = 'triangle';
+  o1.frequency.setValueAtTime(freq, when);
+
+  // Second harmonic (sine, softer)
+  const o2 = ctx.createOscillator();
+  o2.type = 'sine';
+  o2.frequency.setValueAtTime(freq * 2, when);
+  const o2g = ctx.createGain();
+  o2g.gain.value = 0.22;
+
+  // Third harmonic
+  const o3 = ctx.createOscillator();
+  o3.type = 'sine';
+  o3.frequency.setValueAtTime(freq * 3, when);
+  const o3g = ctx.createGain();
+  o3g.gain.value = 0.08;
+
+  // A tiny bit of detune for richness
+  const o4 = ctx.createOscillator();
+  o4.type = 'triangle';
+  o4.frequency.setValueAtTime(freq * 1.003, when);
+  const o4g = ctx.createGain();
+  o4g.gain.value = 0.4;
+
+  // Pluck envelope
+  gain.gain.setValueAtTime(0, when);
+  gain.gain.linearRampToValueAtTime(0.32, when + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.12, when + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.0008, when + duration);
+
+  // Gentle lowpass so it doesn't feel brittle
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(2800, when);
+  filter.Q.value = 0.6;
+
+  o1.connect(gain);
+  o2.connect(o2g); o2g.connect(gain);
+  o3.connect(o3g); o3g.connect(gain);
+  o4.connect(o4g); o4g.connect(gain);
+  gain.connect(filter);
+  filter.connect(ctx.destination);
+
+  const stopAt = when + duration + 0.05;
+  [o1, o2, o3, o4].forEach(o => { o.start(when); o.stop(stopAt); });
+}
+
+function scheduleClick(when, accent = false) {
+  const ctx = getCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = accent ? 1300 : 900;
+  gain.gain.setValueAtTime(accent ? 0.18 : 0.10, when);
+  gain.gain.exponentialRampToValueAtTime(0.001, when + 0.04);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(when);
+  osc.stop(when + 0.06);
+}
+
+// ============================================================
+// MELODY GENERATION
+// ============================================================
+const SCALE = ['b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5'];
+const DURATION_BEATS = { w: 4, h: 2, q: 1, '8': 0.5 };
+
+function generateMelody(numMeasures, difficulty) {
+  // Difficulty dials
+  const cfg = {
+    easy:   { halfProb: 0.30, eighthProb: 0.0, stepBias: 0.75 },
+    medium: { halfProb: 0.20, eighthProb: 0.15, stepBias: 0.60 },
+    hard:   { halfProb: 0.15, eighthProb: 0.30, stepBias: 0.45 },
+  }[difficulty];
+
+  const measures = [];
+  // Seed around middle of the range
+  let idx = 2 + Math.floor(Math.random() * 2); // d/5 or e/5
+
+  for (let m = 0; m < numMeasures; m++) {
+    const notes = [];
+    let beatsLeft = 4;
+    const isLast = m === numMeasures - 1;
+
+    while (beatsLeft > 0) {
+      // Choose duration
+      let duration;
+      if (isLast && beatsLeft === 4 && Math.random() < 0.55) {
+        // Cadential whole or two halves
+        duration = Math.random() < 0.4 ? 'w' : 'h';
+      } else if (isLast && beatsLeft === 2) {
+        duration = 'h';
+      } else if (beatsLeft >= 2 && Math.random() < cfg.halfProb) {
+        duration = 'h';
+      } else if (beatsLeft >= 0.5 && Math.random() < cfg.eighthProb && beatsLeft !== 0.5) {
+        // Generate an eighth-note pair when we commit to 8ths
+        duration = '8pair';
+      } else {
+        duration = 'q';
+      }
+
+      // Handle eighth pair
+      if (duration === '8pair') {
+        for (let k = 0; k < 2; k++) {
+          idx = stepIdx(idx, cfg.stepBias);
+          notes.push({ keys: [SCALE[idx]], duration: '8' });
+        }
+        beatsLeft -= 1;
+        continue;
+      }
+
+      // Regular note
+      idx = stepIdx(idx, cfg.stepBias);
+
+      // Final note of piece: bias toward tonic (B) or dominant (E)
+      if (isLast && beatsLeft === DURATION_BEATS[duration]) {
+        idx = Math.random() < 0.6 ? 0 : 3;
+      }
+
+      notes.push({ keys: [SCALE[idx]], duration });
+      beatsLeft -= DURATION_BEATS[duration];
+    }
+
+    // Beam eighth notes inside the measure
+    measures.push(notes);
+  }
+
+  return measures;
+}
+
+function stepIdx(idx, stepBias) {
+  const r = Math.random();
+  let delta;
+  if (r < stepBias) delta = Math.random() < 0.5 ? -1 : 1;        // step
+  else if (r < stepBias + 0.25) delta = Math.random() < 0.5 ? -2 : 2;  // skip
+  else delta = Math.random() < 0.5 ? -3 : 3;                      // small leap
+  let next = idx + delta;
+  if (next < 0) next = Math.abs(next);
+  if (next > SCALE.length - 1) next = (SCALE.length - 1) - (next - (SCALE.length - 1));
+  return Math.max(0, Math.min(SCALE.length - 1, next));
+}
+
+// ============================================================
+// VEXFLOW RENDERING
+// ============================================================
+// VexFlow globals — bound lazily so a slow/failed CDN load doesn't crash the script
+let VF, Renderer, Stave, StaveNote, Formatter, Voice, Beam;
+function bindVexFlow() {
+  if (!window.Vex || !window.Vex.Flow) return false;
+  VF = window.Vex.Flow;
+  Renderer = VF.Renderer;
+  Stave = VF.Stave;
+  StaveNote = VF.StaveNote;
+  Formatter = VF.Formatter;
+  Voice = VF.Voice;
+  Beam = VF.Beam;
+  return true;
+}
+
+let currentMelody = null;
+let showNoteNames = false;
+
+function renderMelody(measures) {
+  const container = document.getElementById('melody-staff');
+  container.innerHTML = '';
+
+  const isNarrow = window.innerWidth < 640;
+  const measuresPerLine = isNarrow ? 2 : 4;
+  const lines = Math.ceil(measures.length / measuresPerLine);
+
+  const firstMeasureExtra = 65; // clef + time sig space
+  const measureWidth = isNarrow ? 220 : 230;
+  const leftPad = 10;
+  const rightPad = 12;
+  const lineHeight = 130;
+
+  const totalWidth = leftPad + firstMeasureExtra + measureWidth * measuresPerLine + rightPad;
+  const totalHeight = 30 + lineHeight * lines;
+
+  const renderer = new Renderer(container, Renderer.Backends.SVG);
+  renderer.resize(totalWidth, totalHeight);
+  const ctx = renderer.getContext();
+  ctx.setFont('Fraunces, serif', 11);
+
+  measures.forEach((measureNotes, i) => {
+    const line = Math.floor(i / measuresPerLine);
+    const pos = i % measuresPerLine;
+    const y = 20 + line * lineHeight;
+
+    let x, w;
+    if (pos === 0) {
+      x = leftPad;
+      w = firstMeasureExtra + measureWidth;
+    } else {
+      x = leftPad + firstMeasureExtra + measureWidth * pos;
+      w = measureWidth;
+    }
+
+    const stave = new Stave(x, y, w);
+    if (pos === 0) stave.addClef('treble').addTimeSignature('4/4');
+    stave.setContext(ctx).draw();
+
+    const vfNotes = measureNotes.map(n => {
+      const note = new StaveNote({
+        clef: 'treble',
+        keys: n.keys,
+        duration: n.duration,
+        auto_stem: true,
+      });
+      if (showNoteNames) {
+        const letter = n.keys[0][0].toUpperCase();
+        note.addModifier(
+          new VF.Annotation(letter)
+            .setFont('Fraunces', 11, 'italic')
+            .setVerticalJustification(VF.Annotation.VerticalJustify.BOTTOM)
+        );
+      }
+      return note;
+    });
+
+    // Beam eighths
+    const beams = Beam.generateBeams(vfNotes, { maintain_stem_directions: false });
+
+    const voice = new Voice({ num_beats: 4, beat_value: 4 }).setStrict(false);
+    voice.addTickables(vfNotes);
+
+    // Format within the stave's actual note area (after clef/timesig) for even spacing
+    const noteAreaWidth = stave.getNoteEndX() - stave.getNoteStartX() - 15;
+    new Formatter().joinVoices([voice]).format([voice], Math.max(noteAreaWidth, 60));
+
+    voice.draw(ctx, stave);
+    beams.forEach(b => b.setContext(ctx).draw());
+  });
+
+  // Responsive SVG
+  const svg = container.querySelector('svg');
+  if (svg) {
+    svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.maxWidth = '100%';
+    svg.style.height = 'auto';
+  }
+}
+
+// ============================================================
+// MELODY PLAYBACK
+// ============================================================
+let playing = false;
+let scheduledTimeout = null;
+
+function playMelody(measures, tempo) {
+  if (playing) { stopMelody(); return; }
+  playing = true;
+  document.getElementById('play').textContent = '■ Stop';
+
+  const ctx = getCtx();
+  const now = ctx.currentTime + 0.1;
+  const spb = 60 / tempo;
+
+  // Count-in: 4 clicks
+  for (let i = 0; i < 4; i++) {
+    scheduleClick(now + i * spb, i === 0);
+  }
+
+  let offset = 4 * spb; // after count-in
+
+  measures.forEach((measure) => {
+    // Metronome clicks on every beat of this measure
+    for (let b = 0; b < 4; b++) {
+      scheduleClick(now + offset + b * spb, b === 0);
+    }
+
+    let beatPos = 0;
+    measure.forEach(n => {
+      const beats = DURATION_BEATS[n.duration];
+      const dur = beats * spb * 0.92;
+      const freq = NOTE_FREQ[n.keys[0]];
+      scheduleNote(now + offset + beatPos * spb, freq, dur);
+      beatPos += beats;
+    });
+
+    offset += 4 * spb;
+  });
+
+  // End callback
+  const totalTime = offset * 1000 + 200;
+  scheduledTimeout = setTimeout(() => {
+    playing = false;
+    document.getElementById('play').textContent = '▶ Play';
+  }, totalTime);
+}
+
+function stopMelody() {
+  playing = false;
+  if (scheduledTimeout) clearTimeout(scheduledTimeout);
+  // Hard stop: close and recreate context to kill scheduled notes
+  if (audioCtx) {
+    audioCtx.close();
+    audioCtx = null;
+  }
+  document.getElementById('play').textContent = '▶ Play';
+}
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+const FLASH_NOTES = ['b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5'];
+let currentFlashNote = null;
+let stats = { correct: 0, total: 0, streak: 0 };
+let awaitingNext = false;
+
+function renderFlashNote(key) {
+  const container = document.getElementById('flash-staff');
+  container.innerHTML = '';
+
+  const w = 280;
+  const h = 170;
+  const renderer = new Renderer(container, Renderer.Backends.SVG);
+  renderer.resize(w, h);
+  const ctx = renderer.getContext();
+
+  const stave = new Stave(20, 30, w - 40);
+  stave.addClef('treble');
+  stave.setContext(ctx).draw();
+
+  const note = new StaveNote({
+    clef: 'treble',
+    keys: [key],
+    duration: 'w',
+    auto_stem: true,
+  });
+
+  const voice = new Voice({ num_beats: 4, beat_value: 4 }).setStrict(false);
+  voice.addTickables([note]);
+  new Formatter().joinVoices([voice]).format([voice], w - 80);
+  voice.draw(ctx, stave);
+
+  const svg = container.querySelector('svg');
+  if (svg) {
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.maxWidth = '280px';
+    svg.style.height = 'auto';
+  }
+}
+
+function pickNewFlashNote() {
+  let next;
+  do {
+    next = FLASH_NOTES[Math.floor(Math.random() * FLASH_NOTES.length)];
+  } while (next === currentFlashNote && FLASH_NOTES.length > 1);
+  currentFlashNote = next;
+  renderFlashNote(currentFlashNote);
+
+  document.querySelectorAll('.note-btn').forEach(b => {
+    b.classList.remove('correct', 'incorrect');
+    b.disabled = false;
+  });
+  document.getElementById('flash-feedback').innerHTML = '<em>Identify the note.</em>';
+  document.getElementById('flash-feedback').classList.remove('show');
+  awaitingNext = false;
+}
+
+function handleFlashGuess(guess) {
+  if (awaitingNext) {
+    pickNewFlashNote();
+    return;
+  }
+
+  const correctLetter = currentFlashNote[0].toUpperCase();
+  const isCorrect = guess === correctLetter;
+
+  stats.total++;
+  if (isCorrect) {
+    stats.correct++;
+    stats.streak++;
+  } else {
+    stats.streak = 0;
+  }
+  updateStats();
+
+  const btns = document.querySelectorAll('.note-btn');
+  btns.forEach(b => { b.disabled = true; });
+
+  if (isCorrect) {
+    document.querySelector(`.note-btn[data-note="${guess}"]`).classList.add('correct');
+    document.getElementById('flash-feedback').innerHTML =
+      `✓ <strong>${correctLetter}</strong> — ${FRET_LOC[correctLetter]}. <em>Tap any button for next.</em>`;
+  } else {
+    document.querySelector(`.note-btn[data-note="${guess}"]`).classList.add('incorrect');
+    document.querySelector(`.note-btn[data-note="${correctLetter}"]`).classList.add('correct');
+    document.getElementById('flash-feedback').innerHTML =
+      `✗ That was <strong>${correctLetter}</strong> — ${FRET_LOC[correctLetter]}. <em>Tap any button for next.</em>`;
+  }
+  document.getElementById('flash-feedback').classList.add('show');
+
+  // Play the note so the ear learns too
+  const freq = NOTE_FREQ[currentFlashNote];
+  const ctx = getCtx();
+  scheduleNote(ctx.currentTime + 0.05, freq, 1.2);
+
+  awaitingNext = true;
+  // Re-enable buttons so they can tap any for next
+  setTimeout(() => {
+    btns.forEach(b => { b.disabled = false; });
+  }, 300);
+}
+
+function updateStats() {
+  document.getElementById('stat-correct').textContent = stats.correct;
+  document.getElementById('stat-total').textContent = stats.total;
+  document.getElementById('stat-streak').textContent = stats.streak;
+  document.getElementById('stat-accuracy').textContent =
+    stats.total === 0 ? '—' : Math.round(100 * stats.correct / stats.total) + '%';
+}
+
+// ============================================================
+// INIT / EVENT WIRING
+// ============================================================
+let difficulty = 'easy';
+let numMeasures = 4;
+let tempo = 100;
+
+function generateAndRender() {
+  currentMelody = generateMelody(numMeasures, difficulty);
+  renderMelody(currentMelody);
+}
+
+function wireSegmented(id, onChange) {
+  const seg = document.getElementById(id);
+  seg.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onChange(btn.dataset.value);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!bindVexFlow()) {
+    const msg = '<p style="color:var(--burgundy);font-style:italic;padding:20px;text-align:center;">Notation library failed to load. Check your internet connection and reload the page.</p>';
+    document.getElementById('melody-staff').innerHTML = msg;
+    document.getElementById('flash-staff').innerHTML = msg;
+    return;
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById(t.dataset.tab + '-panel').classList.add('active');
+      if (t.dataset.tab === 'flash' && !currentFlashNote) pickNewFlashNote();
+    });
+  });
+
+  // Melody controls
+  wireSegmented('difficulty-seg', v => { difficulty = v; generateAndRender(); });
+  wireSegmented('measures-seg', v => { numMeasures = parseInt(v); generateAndRender(); });
+
+  const tempoEl = document.getElementById('tempo');
+  const tempoNum = document.getElementById('tempo-num');
+  const tempoMarking = document.getElementById('tempo-marking');
+  const tempoPresets = document.getElementById('tempo-presets');
+
+  function setTempo(value, source) {
+    let t = parseInt(value);
+    if (isNaN(t)) t = 100;
+    t = Math.max(40, Math.min(200, t));
+    tempo = t;
+    if (source !== 'slider') tempoEl.value = t;
+    if (source !== 'num') tempoNum.value = t;
+    tempoMarking.textContent = `♩ = ${t}`;
+    // Highlight a matching preset if any
+    tempoPresets.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.tempo) === t);
+    });
+  }
+
+  tempoEl.addEventListener('input', () => setTempo(tempoEl.value, 'slider'));
+  tempoNum.addEventListener('input', () => setTempo(tempoNum.value, 'num'));
+  tempoNum.addEventListener('blur', () => setTempo(tempoNum.value, 'num'));
+  tempoPresets.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => setTempo(btn.dataset.tempo, 'preset'));
+  });
+  setTempo(100, 'init');
+
+  document.getElementById('generate').addEventListener('click', () => {
+    if (playing) stopMelody();
+    generateAndRender();
+  });
+
+  document.getElementById('play').addEventListener('click', () => {
+    if (currentMelody) playMelody(currentMelody, tempo);
+  });
+
+  document.getElementById('toggle-names').addEventListener('click', (e) => {
+    showNoteNames = !showNoteNames;
+    e.target.textContent = showNoteNames ? 'Hide Note Names' : 'Show Note Names';
+    if (currentMelody) renderMelody(currentMelody);
+  });
+
+  // Flashcards
+  document.querySelectorAll('.note-btn').forEach(b => {
+    b.addEventListener('click', () => handleFlashGuess(b.dataset.note));
+  });
+
+  document.getElementById('hear-note').addEventListener('click', () => {
+    if (!currentFlashNote) return;
+    const ctx = getCtx();
+    scheduleNote(ctx.currentTime + 0.05, NOTE_FREQ[currentFlashNote], 1.4);
+  });
+
+  document.getElementById('reset-stats').addEventListener('click', () => {
+    stats = { correct: 0, total: 0, streak: 0 };
+    updateStats();
+  });
+
+  // Re-render on resize (only the melody since flashcard is static size)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (currentMelody) renderMelody(currentMelody);
+    }, 200);
+  });
+
+  // Initial render
+  generateAndRender();
+});
+</script>
+</body>
+</html>
