@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sight Reading Practice — Two-String Songs</title>
+<title>Sight Reading Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Crimson+Pro:ital,wght@0,300..900&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
 
   header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     padding-bottom: 32px;
     border-bottom: 1px solid var(--ink);
     position: relative;
@@ -60,6 +60,21 @@
     width: 60%;
     border-bottom: 1px solid var(--ink);
   }
+
+  .back-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 4px 0;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .back-btn:hover { color: var(--burgundy); }
 
   .header-ornament {
     display: inline-block;
@@ -93,6 +108,64 @@
     font-size: 18px;
     color: var(--ink-soft);
     letter-spacing: 0.03em;
+  }
+
+  /* String selector */
+  .string-selector {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .string-selector-label {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+  }
+
+  .string-toggles {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .string-btn {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid var(--ink-light);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.12s;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+
+  .string-btn:hover {
+    background: rgba(122, 46, 46, 0.06);
+    border-color: var(--ink-soft);
+  }
+
+  .string-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .string-btn .string-num {
+    font-size: 11px;
+    opacity: 0.7;
+    display: block;
+    line-height: 1;
+    margin-bottom: 1px;
   }
 
   .tabs {
@@ -277,7 +350,6 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.25);
   }
 
-  /* Tempo number input */
   #tempo-num {
     font-family: 'Fraunces', serif;
     font-size: 15px;
@@ -560,6 +632,8 @@
     .stats { grid-template-columns: repeat(2, 1fr); gap: 16px; }
     .tab { padding: 12px 16px; font-size: 17px; }
     h1 { font-size: 34px; }
+    .string-toggles { gap: 4px; }
+    .string-btn { font-size: 13px; padding: 6px 10px; }
   }
 </style>
 </head>
@@ -567,10 +641,24 @@
 <div class="page">
 
   <header>
+    <a href="index.html" class="back-btn">← Back</a>
     <div class="header-ornament">· ·  ·</div>
     <h1>Sight Reading <em>Practice</em></h1>
-    <p class="subtitle">Two-String Exercises — B and High E</p>
+    <p class="subtitle" id="subtitle">B &amp; High E · Treble Clef</p>
   </header>
+
+  <!-- String selector (shared between melody and flashcards) -->
+  <div class="string-selector">
+    <span class="string-selector-label">Strings</span>
+    <div class="string-toggles">
+      <button class="string-btn" data-string="1"><span class="string-num">①</span>High E</button>
+      <button class="string-btn active" data-string="2"><span class="string-num">②</span>B</button>
+      <button class="string-btn" data-string="3"><span class="string-num">③</span>G</button>
+      <button class="string-btn" data-string="4"><span class="string-num">④</span>D</button>
+      <button class="string-btn" data-string="5"><span class="string-num">⑤</span>A</button>
+      <button class="string-btn" data-string="6"><span class="string-num">⑥</span>Low E</button>
+    </div>
+  </div>
 
   <nav class="tabs">
     <button class="tab active" data-tab="melody">Melody Generator</button>
@@ -636,12 +724,7 @@
     </div>
 
     <div class="flash-buttons" id="flash-buttons">
-      <button class="note-btn" data-note="B">B</button>
-      <button class="note-btn" data-note="C">C</button>
-      <button class="note-btn" data-note="D">D</button>
-      <button class="note-btn" data-note="E">E</button>
-      <button class="note-btn" data-note="F">F</button>
-      <button class="note-btn" data-note="G">G</button>
+      <!-- populated dynamically -->
     </div>
 
     <div class="stats">
@@ -658,20 +741,110 @@
   </section>
 
   <footer>
-    <div>Notes used: B, C, D on B string · E, F, G on high E string</div>
-    <div class="fretguide">
-      <span><em>B</em> 0</span>
-      <span><em>C</em> 1</span>
-      <span><em>D</em> 3</span>
-      <span><em>E</em> 0</span>
-      <span><em>F</em> 1</span>
-      <span><em>G</em> 3</span>
-    </div>
+    <div id="footer-notes">Notes used: B, C, D on B string · E, F, G on High E string</div>
+    <div class="fretguide" id="footer-frets"></div>
   </footer>
 
 </div>
 
 <script>
+// ============================================================
+// GUITAR STRING DEFINITIONS
+// Notes use "written up an octave" convention (guitar transposing instrument).
+// Clef groups: treble = strings 1-4, bass = strings 5-6.
+// ============================================================
+const GUITAR_STRINGS = [
+  {
+    id: 1, name: 'High E', clef: 'treble',
+    notes: ['e/5', 'f/5', 'g/5'],
+    noteNames: ['E', 'F', 'G'],
+    frets: [0, 1, 3],
+  },
+  {
+    id: 2, name: 'B', clef: 'treble',
+    notes: ['b/4', 'c/5', 'd/5'],
+    noteNames: ['B', 'C', 'D'],
+    frets: [0, 1, 3],
+  },
+  {
+    id: 3, name: 'G', clef: 'treble',
+    notes: ['g/4', 'a/4', 'b/4'],
+    noteNames: ['G', 'A', 'B'],
+    frets: [0, 2, 4],
+  },
+  {
+    id: 4, name: 'D', clef: 'treble',
+    notes: ['d/4', 'e/4', 'f/4'],
+    noteNames: ['D', 'E', 'F'],
+    frets: [0, 2, 3],
+  },
+  {
+    id: 5, name: 'A', clef: 'bass',
+    notes: ['a/3', 'b/3', 'c/4'],
+    noteNames: ['A', 'B', 'C'],
+    frets: [0, 2, 3],
+  },
+  {
+    id: 6, name: 'Low E', clef: 'bass',
+    notes: ['e/3', 'f/3', 'g/3'],
+    noteNames: ['E', 'F', 'G'],
+    frets: [0, 1, 3],
+  },
+];
+
+// Starts with just the B string selected (matching original default)
+let selectedStringIds = new Set([2]);
+
+// ============================================================
+// STRING HELPERS
+// ============================================================
+const NOTE_LETTER_ORDER = { c: 0, d: 1, e: 2, f: 3, g: 4, a: 5, b: 6 };
+
+function pitchToNum(key) {
+  const [letter, octave] = key.split('/');
+  return parseInt(octave) * 7 + NOTE_LETTER_ORDER[letter];
+}
+
+function getActiveClef() {
+  const active = GUITAR_STRINGS.filter(s => selectedStringIds.has(s.id));
+  if (active.length > 0 && active.every(s => s.clef === 'bass')) return 'bass';
+  return 'treble';
+}
+
+function getActiveScale() {
+  const notes = new Set();
+  GUITAR_STRINGS.forEach(s => {
+    if (selectedStringIds.has(s.id)) s.notes.forEach(n => notes.add(n));
+  });
+  return Array.from(notes).sort((a, b) => pitchToNum(a) - pitchToNum(b));
+}
+
+function getUniqueNoteLetters() {
+  const letters = new Set();
+  GUITAR_STRINGS.forEach(s => {
+    if (selectedStringIds.has(s.id)) s.noteNames.forEach(n => letters.add(n));
+  });
+  // Sort by musical order (C D E F G A B)
+  return Array.from(letters).sort(
+    (a, b) => NOTE_LETTER_ORDER[a.toLowerCase()] - NOTE_LETTER_ORDER[b.toLowerCase()]
+  );
+}
+
+function getFretLoc(noteKey) {
+  const locs = [];
+  const seen = new Set();
+  GUITAR_STRINGS.forEach(s => {
+    if (!selectedStringIds.has(s.id)) return;
+    s.notes.forEach((note, i) => {
+      if (note !== noteKey) return;
+      const fret = s.frets[i];
+      const loc = fret === 0 ? `open ${s.name}` : `fret ${fret}, ${s.name}`;
+      if (!seen.has(loc)) { seen.add(loc); locs.push(loc); }
+    });
+  });
+  return locs.join(' or ') || noteKey;
+}
+
 // ============================================================
 // AUDIO
 // ============================================================
@@ -682,25 +855,32 @@ function getCtx() {
   return audioCtx;
 }
 
-// Guitar sounds an octave below written; use the sounding pitch so playback
-// sounds at guitar pitch rather than piccolo-high.
+// Sounding frequencies (guitar transposing, one octave below written).
 const NOTE_FREQ = {
-  'b/4': 246.94,  // B3
-  'c/5': 261.63,  // C4
-  'd/5': 293.66,  // D4
-  'e/5': 329.63,  // E4
-  'f/5': 349.23,  // F4
-  'g/5': 392.00,  // G4
-};
-
-// Fret locations for feedback
-const FRET_LOC = {
-  'B': 'open B string',
-  'C': '1st fret, B string',
-  'D': '3rd fret, B string',
-  'E': 'open high E string',
-  'F': '1st fret, high E string',
-  'G': '3rd fret, high E string',
+  // String 1 (High E): written e/5, f/5, g/5 — sounding E4, F4, G4
+  'e/5': 329.63,
+  'f/5': 349.23,
+  'g/5': 392.00,
+  // String 2 (B): written b/4, c/5, d/5 — sounding B3, C4, D4
+  'b/4': 246.94,
+  'c/5': 261.63,
+  'd/5': 293.66,
+  // String 3 (G): written g/4, a/4, b/4 — sounding G3, A3, B3
+  'g/4': 196.00,
+  'a/4': 220.00,
+  // b/4 shared with String 2
+  // String 4 (D): written d/4, e/4, f/4 — sounding D3, E3, F3
+  'd/4': 146.83,
+  'e/4': 164.81,
+  'f/4': 174.61,
+  // String 5 (A): written a/3, b/3, c/4 — sounding A2, B2, C3
+  'a/3': 110.00,
+  'b/3': 123.47,
+  'c/4': 130.81,
+  // String 6 (Low E): written e/3, f/3, g/3 — sounding E2, F2, G2
+  'e/3': 82.41,
+  'f/3': 87.31,
+  'g/3': 98.00,
 };
 
 // Pluck-ish synthesized note
@@ -708,39 +888,33 @@ function scheduleNote(when, freq, duration) {
   const ctx = getCtx();
   const gain = ctx.createGain();
 
-  // Fundamental (triangle for warmth)
   const o1 = ctx.createOscillator();
   o1.type = 'triangle';
   o1.frequency.setValueAtTime(freq, when);
 
-  // Second harmonic (sine, softer)
   const o2 = ctx.createOscillator();
   o2.type = 'sine';
   o2.frequency.setValueAtTime(freq * 2, when);
   const o2g = ctx.createGain();
   o2g.gain.value = 0.22;
 
-  // Third harmonic
   const o3 = ctx.createOscillator();
   o3.type = 'sine';
   o3.frequency.setValueAtTime(freq * 3, when);
   const o3g = ctx.createGain();
   o3g.gain.value = 0.08;
 
-  // A tiny bit of detune for richness
   const o4 = ctx.createOscillator();
   o4.type = 'triangle';
   o4.frequency.setValueAtTime(freq * 1.003, when);
   const o4g = ctx.createGain();
   o4g.gain.value = 0.4;
 
-  // Pluck envelope
   gain.gain.setValueAtTime(0, when);
   gain.gain.linearRampToValueAtTime(0.32, when + 0.008);
   gain.gain.exponentialRampToValueAtTime(0.12, when + 0.15);
   gain.gain.exponentialRampToValueAtTime(0.0008, when + duration);
 
-  // Gentle lowpass so it doesn't feel brittle
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(2800, when);
@@ -774,20 +948,30 @@ function scheduleClick(when, accent = false) {
 // ============================================================
 // MELODY GENERATION
 // ============================================================
-const SCALE = ['b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5'];
 const DURATION_BEATS = { w: 4, h: 2, q: 1, '8': 0.5 };
 
-function generateMelody(numMeasures, difficulty) {
-  // Difficulty dials
+function generateMelody(numMeasures, difficulty, scale) {
   const cfg = {
-    easy:   { halfProb: 0.30, eighthProb: 0.0, stepBias: 0.75 },
+    easy:   { halfProb: 0.30, eighthProb: 0.0,  stepBias: 0.75 },
     medium: { halfProb: 0.20, eighthProb: 0.15, stepBias: 0.60 },
     hard:   { halfProb: 0.15, eighthProb: 0.30, stepBias: 0.45 },
   }[difficulty];
 
   const measures = [];
-  // Seed around middle of the range
-  let idx = 2 + Math.floor(Math.random() * 2); // d/5 or e/5
+  // Seed around lower-middle of range
+  let idx = Math.floor(Math.random() * Math.max(1, Math.ceil(scale.length / 2)));
+
+  function stepIdx(current) {
+    const r = Math.random();
+    let delta;
+    if (r < cfg.stepBias) delta = Math.random() < 0.5 ? -1 : 1;
+    else if (r < cfg.stepBias + 0.25) delta = Math.random() < 0.5 ? -2 : 2;
+    else delta = Math.random() < 0.5 ? -3 : 3;
+    let next = current + delta;
+    if (next < 0) next = Math.abs(next);
+    if (next > scale.length - 1) next = (scale.length - 1) - (next - (scale.length - 1));
+    return Math.max(0, Math.min(scale.length - 1, next));
+  }
 
   for (let m = 0; m < numMeasures; m++) {
     const notes = [];
@@ -795,67 +979,48 @@ function generateMelody(numMeasures, difficulty) {
     const isLast = m === numMeasures - 1;
 
     while (beatsLeft > 0) {
-      // Choose duration
       let duration;
       if (isLast && beatsLeft === 4 && Math.random() < 0.55) {
-        // Cadential whole or two halves
         duration = Math.random() < 0.4 ? 'w' : 'h';
       } else if (isLast && beatsLeft === 2) {
         duration = 'h';
       } else if (beatsLeft >= 2 && Math.random() < cfg.halfProb) {
         duration = 'h';
       } else if (beatsLeft >= 0.5 && Math.random() < cfg.eighthProb && beatsLeft !== 0.5) {
-        // Generate an eighth-note pair when we commit to 8ths
         duration = '8pair';
       } else {
         duration = 'q';
       }
 
-      // Handle eighth pair
       if (duration === '8pair') {
         for (let k = 0; k < 2; k++) {
-          idx = stepIdx(idx, cfg.stepBias);
-          notes.push({ keys: [SCALE[idx]], duration: '8' });
+          idx = stepIdx(idx);
+          notes.push({ keys: [scale[idx]], duration: '8' });
         }
         beatsLeft -= 1;
         continue;
       }
 
-      // Regular note
-      idx = stepIdx(idx, cfg.stepBias);
+      idx = stepIdx(idx);
 
-      // Final note of piece: bias toward tonic (B) or dominant (E)
       if (isLast && beatsLeft === DURATION_BEATS[duration]) {
-        idx = Math.random() < 0.6 ? 0 : 3;
+        // Bias toward tonic (lowest) or middle of range
+        idx = Math.random() < 0.6 ? 0 : Math.floor(scale.length / 2);
       }
 
-      notes.push({ keys: [SCALE[idx]], duration });
+      notes.push({ keys: [scale[idx]], duration });
       beatsLeft -= DURATION_BEATS[duration];
     }
 
-    // Beam eighth notes inside the measure
     measures.push(notes);
   }
 
   return measures;
 }
 
-function stepIdx(idx, stepBias) {
-  const r = Math.random();
-  let delta;
-  if (r < stepBias) delta = Math.random() < 0.5 ? -1 : 1;        // step
-  else if (r < stepBias + 0.25) delta = Math.random() < 0.5 ? -2 : 2;  // skip
-  else delta = Math.random() < 0.5 ? -3 : 3;                      // small leap
-  let next = idx + delta;
-  if (next < 0) next = Math.abs(next);
-  if (next > SCALE.length - 1) next = (SCALE.length - 1) - (next - (SCALE.length - 1));
-  return Math.max(0, Math.min(SCALE.length - 1, next));
-}
-
 // ============================================================
 // VEXFLOW RENDERING
 // ============================================================
-// VexFlow globals — bound lazily so a slow/failed CDN load doesn't crash the script
 let VF, Renderer, Stave, StaveNote, Formatter, Voice, Beam;
 function bindVexFlow() {
   if (!window.Vex || !window.Vex.Flow) return false;
@@ -872,7 +1037,7 @@ function bindVexFlow() {
 let currentMelody = null;
 let showNoteNames = false;
 
-function renderMelody(measures) {
+function renderMelody(measures, clef) {
   const container = document.getElementById('melody-staff');
   container.innerHTML = '';
 
@@ -880,7 +1045,7 @@ function renderMelody(measures) {
   const measuresPerLine = isNarrow ? 2 : 4;
   const lines = Math.ceil(measures.length / measuresPerLine);
 
-  const firstMeasureExtra = 65; // clef + time sig space
+  const firstMeasureExtra = 65;
   const measureWidth = isNarrow ? 220 : 230;
   const leftPad = 10;
   const rightPad = 12;
@@ -909,12 +1074,12 @@ function renderMelody(measures) {
     }
 
     const stave = new Stave(x, y, w);
-    if (pos === 0) stave.addClef('treble').addTimeSignature('4/4');
+    if (pos === 0) stave.addClef(clef).addTimeSignature('4/4');
     stave.setContext(ctx).draw();
 
     const vfNotes = measureNotes.map(n => {
       const note = new StaveNote({
-        clef: 'treble',
+        clef,
         keys: n.keys,
         duration: n.duration,
         auto_stem: true,
@@ -930,13 +1095,11 @@ function renderMelody(measures) {
       return note;
     });
 
-    // Beam eighths
     const beams = Beam.generateBeams(vfNotes, { maintain_stem_directions: false });
 
     const voice = new Voice({ num_beats: 4, beat_value: 4 }).setStrict(false);
     voice.addTickables(vfNotes);
 
-    // Format within the stave's actual note area (after clef/timesig) for even spacing
     const noteAreaWidth = stave.getNoteEndX() - stave.getNoteStartX() - 15;
     new Formatter().joinVoices([voice]).format([voice], Math.max(noteAreaWidth, 60));
 
@@ -944,7 +1107,6 @@ function renderMelody(measures) {
     beams.forEach(b => b.setContext(ctx).draw());
   });
 
-  // Responsive SVG
   const svg = container.querySelector('svg');
   if (svg) {
     svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
@@ -970,15 +1132,13 @@ function playMelody(measures, tempo) {
   const now = ctx.currentTime + 0.1;
   const spb = 60 / tempo;
 
-  // Count-in: 4 clicks
   for (let i = 0; i < 4; i++) {
     scheduleClick(now + i * spb, i === 0);
   }
 
-  let offset = 4 * spb; // after count-in
+  let offset = 4 * spb;
 
   measures.forEach((measure) => {
-    // Metronome clicks on every beat of this measure
     for (let b = 0; b < 4; b++) {
       scheduleClick(now + offset + b * spb, b === 0);
     }
@@ -995,7 +1155,6 @@ function playMelody(measures, tempo) {
     offset += 4 * spb;
   });
 
-  // End callback
   const totalTime = offset * 1000 + 200;
   scheduledTimeout = setTimeout(() => {
     playing = false;
@@ -1006,7 +1165,6 @@ function playMelody(measures, tempo) {
 function stopMelody() {
   playing = false;
   if (scheduledTimeout) clearTimeout(scheduledTimeout);
-  // Hard stop: close and recreate context to kill scheduled notes
   if (audioCtx) {
     audioCtx.close();
     audioCtx = null;
@@ -1017,12 +1175,11 @@ function stopMelody() {
 // ============================================================
 // FLASHCARDS
 // ============================================================
-const FLASH_NOTES = ['b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5'];
 let currentFlashNote = null;
 let stats = { correct: 0, total: 0, streak: 0 };
 let awaitingNext = false;
 
-function renderFlashNote(key) {
+function renderFlashNote(key, clef) {
   const container = document.getElementById('flash-staff');
   container.innerHTML = '';
 
@@ -1033,11 +1190,11 @@ function renderFlashNote(key) {
   const ctx = renderer.getContext();
 
   const stave = new Stave(20, 30, w - 40);
-  stave.addClef('treble');
+  stave.addClef(clef);
   stave.setContext(ctx).draw();
 
   const note = new StaveNote({
-    clef: 'treble',
+    clef,
     keys: [key],
     duration: 'w',
     auto_stem: true,
@@ -1058,13 +1215,31 @@ function renderFlashNote(key) {
   }
 }
 
+function rebuildFlashButtons() {
+  const container = document.getElementById('flash-buttons');
+  const letters = getUniqueNoteLetters();
+  container.innerHTML = '';
+  const cols = Math.min(Math.max(letters.length, 3), 6);
+  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  letters.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'note-btn';
+    btn.dataset.note = letter;
+    btn.textContent = letter;
+    btn.addEventListener('click', () => handleFlashGuess(letter));
+    container.appendChild(btn);
+  });
+}
+
 function pickNewFlashNote() {
+  const flashNotes = getActiveScale();
+  if (flashNotes.length === 0) return;
   let next;
   do {
-    next = FLASH_NOTES[Math.floor(Math.random() * FLASH_NOTES.length)];
-  } while (next === currentFlashNote && FLASH_NOTES.length > 1);
+    next = flashNotes[Math.floor(Math.random() * flashNotes.length)];
+  } while (next === currentFlashNote && flashNotes.length > 1);
   currentFlashNote = next;
-  renderFlashNote(currentFlashNote);
+  renderFlashNote(currentFlashNote, getActiveClef());
 
   document.querySelectorAll('.note-btn').forEach(b => {
     b.classList.remove('correct', 'incorrect');
@@ -1096,25 +1271,25 @@ function handleFlashGuess(guess) {
   const btns = document.querySelectorAll('.note-btn');
   btns.forEach(b => { b.disabled = true; });
 
+  const loc = getFretLoc(currentFlashNote);
+
   if (isCorrect) {
     document.querySelector(`.note-btn[data-note="${guess}"]`).classList.add('correct');
     document.getElementById('flash-feedback').innerHTML =
-      `✓ <strong>${correctLetter}</strong> — ${FRET_LOC[correctLetter]}. <em>Tap any button for next.</em>`;
+      `✓ <strong>${correctLetter}</strong> — ${loc}. <em>Tap any button for next.</em>`;
   } else {
     document.querySelector(`.note-btn[data-note="${guess}"]`).classList.add('incorrect');
     document.querySelector(`.note-btn[data-note="${correctLetter}"]`).classList.add('correct');
     document.getElementById('flash-feedback').innerHTML =
-      `✗ That was <strong>${correctLetter}</strong> — ${FRET_LOC[correctLetter]}. <em>Tap any button for next.</em>`;
+      `✗ That was <strong>${correctLetter}</strong> — ${loc}. <em>Tap any button for next.</em>`;
   }
   document.getElementById('flash-feedback').classList.add('show');
 
-  // Play the note so the ear learns too
   const freq = NOTE_FREQ[currentFlashNote];
   const ctx = getCtx();
   scheduleNote(ctx.currentTime + 0.05, freq, 1.2);
 
   awaitingNext = true;
-  // Re-enable buttons so they can tap any for next
   setTimeout(() => {
     btns.forEach(b => { b.disabled = false; });
   }, 300);
@@ -1129,6 +1304,51 @@ function updateStats() {
 }
 
 // ============================================================
+// DYNAMIC UI UPDATES
+// ============================================================
+function updateSubtitle() {
+  const active = GUITAR_STRINGS.filter(s => selectedStringIds.has(s.id));
+  const names = active.map(s => s.name).join(' · ');
+  const clefLabel = getActiveClef() === 'bass' ? 'Bass Clef' : 'Treble Clef';
+  document.getElementById('subtitle').textContent = `${names} · ${clefLabel}`;
+}
+
+function updateFooter() {
+  const active = GUITAR_STRINGS.filter(s => selectedStringIds.has(s.id));
+  const notesByString = active
+    .map(s => `${s.noteNames.join(', ')} on ${s.name} string`)
+    .join(' · ');
+  document.getElementById('footer-notes').textContent = `Notes used: ${notesByString}`;
+
+  // Build fret guide from all note keys in the active scale
+  const fretGuide = document.getElementById('footer-frets');
+  fretGuide.innerHTML = '';
+  const scale = getActiveScale();
+  scale.forEach(noteKey => {
+    const letter = noteKey[0].toUpperCase();
+    const loc = getFretLoc(noteKey);
+    const span = document.createElement('span');
+    span.innerHTML = `<em>${letter}</em> ${loc}`;
+    fretGuide.appendChild(span);
+  });
+}
+
+function onStringsChanged() {
+  awaitingNext = false;
+  currentFlashNote = null;
+  updateSubtitle();
+  updateFooter();
+  rebuildFlashButtons();
+  if (playing) stopMelody();
+  generateAndRender();
+  if (document.getElementById('flash-panel').classList.contains('active')) {
+    pickNewFlashNote();
+  }
+  stats = { correct: 0, total: 0, streak: 0 };
+  updateStats();
+}
+
+// ============================================================
 // INIT / EVENT WIRING
 // ============================================================
 let difficulty = 'easy';
@@ -1136,8 +1356,10 @@ let numMeasures = 4;
 let tempo = 100;
 
 function generateAndRender() {
-  currentMelody = generateMelody(numMeasures, difficulty);
-  renderMelody(currentMelody);
+  const scale = getActiveScale();
+  if (scale.length === 0) return;
+  currentMelody = generateMelody(numMeasures, difficulty, scale);
+  renderMelody(currentMelody, getActiveClef());
 }
 
 function wireSegmented(id, onChange) {
@@ -1170,6 +1392,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // String toggles
+  document.querySelectorAll('.string-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.string);
+      if (selectedStringIds.has(id)) {
+        if (selectedStringIds.size === 1) return; // must keep at least one
+        selectedStringIds.delete(id);
+        btn.classList.remove('active');
+      } else {
+        selectedStringIds.add(id);
+        btn.classList.add('active');
+      }
+      onStringsChanged();
+    });
+  });
+
   // Melody controls
   wireSegmented('difficulty-seg', v => { difficulty = v; generateAndRender(); });
   wireSegmented('measures-seg', v => { numMeasures = parseInt(v); generateAndRender(); });
@@ -1187,7 +1425,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (source !== 'slider') tempoEl.value = t;
     if (source !== 'num') tempoNum.value = t;
     tempoMarking.textContent = `♩ = ${t}`;
-    // Highlight a matching preset if any
     tempoPresets.querySelectorAll('button').forEach(b => {
       b.classList.toggle('active', parseInt(b.dataset.tempo) === t);
     });
@@ -1213,12 +1450,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('toggle-names').addEventListener('click', (e) => {
     showNoteNames = !showNoteNames;
     e.target.textContent = showNoteNames ? 'Hide Note Names' : 'Show Note Names';
-    if (currentMelody) renderMelody(currentMelody);
-  });
-
-  // Flashcards
-  document.querySelectorAll('.note-btn').forEach(b => {
-    b.addEventListener('click', () => handleFlashGuess(b.dataset.note));
+    if (currentMelody) renderMelody(currentMelody, getActiveClef());
   });
 
   document.getElementById('hear-note').addEventListener('click', () => {
@@ -1232,16 +1464,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats();
   });
 
-  // Re-render on resize (only the melody since flashcard is static size)
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      if (currentMelody) renderMelody(currentMelody);
+      if (currentMelody) renderMelody(currentMelody, getActiveClef());
     }, 200);
   });
 
-  // Initial render
+  // Initial setup
+  updateSubtitle();
+  updateFooter();
+  rebuildFlashButtons();
   generateAndRender();
 });
 </script>
