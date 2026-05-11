@@ -237,7 +237,7 @@
     color: var(--ink-soft);
     cursor: pointer;
     border-right: 1px solid var(--ink-soft);
-    transition: all 0.15s;
+    transition: background-color 0.15s, color 0.15s;
   }
 
   .segmented button:last-child { border-right: none; }
@@ -282,7 +282,7 @@
     color: var(--ink-soft);
     cursor: pointer;
     border-radius: 2px;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     letter-spacing: 0.02em;
   }
 
@@ -396,7 +396,7 @@
     color: var(--ink-soft);
     cursor: pointer;
     border-radius: 2px;
-    transition: all 0.12s;
+    transition: background-color 0.12s, border-color 0.12s, color 0.12s;
     letter-spacing: 0.02em;
   }
 
@@ -429,7 +429,7 @@
     color: var(--ink);
     cursor: pointer;
     border-radius: 2px;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
     letter-spacing: 0.03em;
     font-weight: 400;
   }
@@ -488,7 +488,7 @@
     color: var(--ink);
     cursor: pointer;
     border-radius: 2px;
-    transition: all 0.12s;
+    transition: background-color 0.12s, border-color 0.12s, color 0.12s, transform 0.12s;
   }
 
   .note-btn:hover {
@@ -862,6 +862,8 @@ const STRINGS = {
     notes: [
       { letter: 'G', key: 'g/4', freq: 196.00, fret: 0, loc: 'open G string' },
       { letter: 'A', key: 'a/4', freq: 220.00, fret: 2, loc: '2nd fret, G string' },
+      // b/4 at 246.94 Hz is the same written pitch as open B string (string 2); when both strings
+      // are active the note appears twice in the pool — identical on the staff but different fret.
       { letter: 'B', key: 'b/4', freq: 246.94, fret: 4, loc: '4th fret, G string' },
     ],
   },
@@ -899,14 +901,9 @@ function activeScale() {
   return all;
 }
 
-function clefModeFor(measures) {
-  let hasT = false, hasB = false;
-  for (const m of measures) {
-    for (const n of m) {
-      if (n.note.clef === 'treble') hasT = true;
-      else hasB = true;
-    }
-  }
+function clefModeForStrings(ids) {
+  const hasT = ids.some(id => STRINGS[id].clef === 'treble');
+  const hasB = ids.some(id => STRINGS[id].clef === 'bass');
   if (hasT && hasB) return 'grand';
   return hasB ? 'bass' : 'treble';
 }
@@ -1113,7 +1110,7 @@ function renderMelody(measures) {
     return;
   }
 
-  const mode = clefModeFor(measures);
+  const mode = clefModeForStrings(selectedStrings);
   if (mode === 'grand') {
     renderGrand(container, measures);
   } else {
@@ -1672,7 +1669,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const stored = loadConfig();
   if (stored) {
     if (Array.isArray(stored.selectedStrings) && stored.selectedStrings.length > 0) {
-      const wanted = new Set(stored.selectedStrings.map(Number));
+      const wanted = new Set(stored.selectedStrings.map(Number).filter(n => n >= 1 && n <= 6));
       stringsSeg.querySelectorAll('button').forEach(b => {
         b.classList.toggle('active', wanted.has(parseInt(b.dataset.string)));
       });
